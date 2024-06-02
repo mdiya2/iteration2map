@@ -78,7 +78,7 @@
         </select>
         <select id="rating-filter">
             <option value="all">All Ratings</option>
-            <option value="5">5 Stars</option>
+            <option value="5+">5 Stars</option>
             <option value="4-5">4 Stars</option>
             <option value="3-4">3 Stars</option>
         </select>
@@ -154,11 +154,11 @@
 
                 // Filter by rating
                 if (selectedRating !== 'all') {
-                    if (selectedRating === '4+' && business.rating < 4) {
+                    if (selectedRating === '5+' && business.rating < 5) {
+                        show = false;
+                    } else if (selectedRating === '4-5' && (business.rating < 4 || business.rating >= 5)) {
                         show = false;
                     } else if (selectedRating === '3-4' && (business.rating < 3 || business.rating >= 4)) {
-                        show = false;
-                    } else if (selectedRating === 'below 3' && business.rating >= 3) {
                         show = false;
                     }
                 }
