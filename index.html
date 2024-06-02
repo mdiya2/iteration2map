@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Business Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #map {
+            height: 600px;
+            width: 80%;
+        }
+        #filters {
+            margin: 20px 0;
+        }
+        select {
+            padding: 5px;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="filters">
+        <select id="type-filter">
+            <option value="all">All Types</option>
+            <option value="Cosmetics & Beauty Supply">Cosmetics & Beauty Supply</option>
+            <option value="Seafood">Seafood</option>
+            <option value="Soulfood">Soulfood</option>
+            <option value="Shaved Ice">Shaved Ice</option>
+            <option value="Desserts">Desserts</option>
+            <option value="Coffee & Tea">Coffee & Tea</option>
+            <option value="Printing Services">Printing Services</option>
+            <option value="Graphic Design">Graphic Design</option>
+            <option value="Screen Printing/T-Shirt Printing">Screen Printing/T-Shirt Printing</option>
+            <option value="New American">New American</option>
+            <option value="Cocktail Bars">Cocktail Bars</option>
+            <option value="Juice Bars & Smoothies">Juice Bars & Smoothies</option>
+            <option value="Cafes">Cafes</option>
+            <option value="Acai Bowls">Acai Bowls</option>
+            <option value="Arts & Crafts">Arts & Crafts</option>
+            <option value="Knitting Supplies">Knitting Supplies</option>
+            <option value="American">American</option>
+            <option value="Breakfast & Brunch">Breakfast & Brunch</option>
+            <option value="Tea Rooms">Tea Rooms</option>
+            <option value="Jazz & Blues">Jazz & Blues</option>
+            <option value="Wine Bars">Wine Bars</option>
+            <option value="Hookah Bars">Hookah Bars</option>
+            <option value="Furniture Repair">Furniture Repair</option>
+            <option value="Refinishing Services">Refinishing Services</option>
+            <option value="Lounges">Lounges</option>
+            <option value="Hair Salons">Hair Salons</option>
+            <option value="Cajun/Creole">Cajun/Creole</option>
+            <option value="Southern">Southern</option>
+            <option value="Salad">Salad</option>
+            <option value="Pasta Shops">Pasta Shops</option>
+            <option value="Speakeasies">Speakeasies</option>
+        </select>
+        <select id="reviews-filter">
+            <option value="all">All Reviews</option>
+            <option value="0-20">0-20 Reviews</option>
+            <option value="20-50">20-50 Reviews</option>
+            <option value="50-100">50-100 Reviews</option>
+            <option value="100+">100+ Reviews</option>
+        </select>
+        <select id="rating-filter">
+            <option value="all">All Ratings</option>
+            <option value="5">5 Stars</option>
+            <option value="4-5">4 Stars</option>
+            <option value="3-4">3 Stars</option>
+        </select>
+    </div>
+    <div id="map"></div>
+
+    <script>
+        // Initialize the map centered on Baltimore
+        var map = L.map('map').setView([39.2904, -76.6122], 13);
+
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Business data
+        var businesses = [
+            {name: "Beauty Plus", type: "Cosmetics & Beauty Supply", reviews: 56, rating: 4.9, coords: [39.3135963857557, -76.6165548726331]},
+            {name: "Everyone's Place African Cultural Center", type: "Bookstores", reviews: 28, rating: 4.5, coords: [39.31045, -76.6399]},
+            {name: "Restaurant 2110", type: "Seafood, Soulfood", reviews: 15, rating: 4.0, coords: [39.31364, -76.61709]},
+            {name: "Ice Queens", type: "Shaved Ice, Desserts, Coffee & Tea", reviews: 111, rating: 4.8, coords: [39.26829, -76.59108]},
+            {name: "Curry Printing", type: "Printing Services, Graphic Design, Screen Printing/T-Shirt Printing", reviews: 16, rating: 4.5, coords: [39.2929613, -76.615533]},
+            {name: "BLK SWAN", type: "New American, Cocktail Bars", reviews: 424, rating: 3.8, coords: [39.284521, -76.598812]},
+            {name: "Niecys Fabulous Juice Bar", type: "Juice Bars & Smoothies, Cafes, Acai Bowls", reviews: 3, rating: 5.0, coords: [39.33884, -76.55109]},
+            {name: "Neighborhood Fiber Company", type: "Arts & Crafts, Knitting Supplies", reviews: 7, rating: 4.1, coords: [39.2968062171486, -76.6215137922805]},
+            {name: "Home Maid", type: "American, Breakfast & Brunch, Cocktail Bars", reviews: 485, rating: 3.9, coords: [39.27369322933664, -76.603197]},
+            {name: "Terra Cafe", type: "Cafes", reviews: 223, rating: 3.7, coords: [39.317729, -76.615094]},
+            {name: "Cuples Tea House", type: "Tea Rooms", reviews: 26, rating: 4.9, coords: [39.29432392465113, -76.6193163]},
+            {name: "Corkscrew", type: "Jazz & Blues, Wine Bars, Breakfast & Brunch", reviews: 17, rating: 3.9, coords: [39.33085, -76.63438]},
+            {name: "Garden Rooftop", type: "New American, Hookah Bars, Cocktail Bars", reviews: 16, rating: 3.4, coords: [39.294352933955714, -76.62240931842412]},
+            {name: "Cadden Furniture Service", type: "Furniture Repair, Refinishing Services", reviews: 2, rating: 4.5, coords: [39.3038520812988, -76.5895767211914]},
+            {name: "Next Phaze Cafe", type: "Cafes, Southern, Seafood", reviews: 137, rating: 4.0, coords: [39.2913148, -76.6130198]},
+            {name: "Noir Restaurant & Lounge", type: "New American, Lounges", reviews: 158, rating: 3.1, coords: [39.35976, -76.6104]},
+            {name: "Diaspora Salon", type: "Hair Salons", reviews: 110, rating: 4.1, coords: [39.3167199, -76.6173]},
+            {name: "Creole Soul Restaurant", type: "Cajun/Creole, Soul Food, Southern", reviews: 157, rating: 3.9, coords: [39.32162, -76.6222]},
+            {name: "Peppa Flame Restaurant and Lounge", type: "Salad, Lounges, Pasta Shops", reviews: 125, rating: 4.1, coords: [39.270632, -76.59418]},
+            {name: "The Elk Room", type: "Speakeasies", reviews: 346, rating: 4.1, coords: [39.2844063, -76.5995024]},
+        ];
+
+        // Function to filter businesses based on the selected filters
+        function filterBusinesses() {
+            var selectedType = document.getElementById('type-filter').value;
+            var selectedReviews = document.getElementById('reviews-filter').value;
+            var selectedRating = document.getElementById('rating-filter').value;
+
+            // Remove existing markers
+            map.eachLayer(function(layer){
+                if (layer instanceof L.Marker){
+                    map.removeLayer(layer);
+                }
+            });
+
+            // Add new markers based on filter
+            businesses.forEach(function (business) {
+                var show = true;
+
+                // Filter by type
+                if (selectedType !== 'all' && !business.type.includes(selectedType)) {
+                    show = false;
+                }
+
+                // Filter by reviews
+                if (selectedReviews !== 'all') {
+                    var reviewsRange = selectedReviews.split('-');
+                    if (reviewsRange.length === 2) {
+                        if (business.reviews < parseInt(reviewsRange[0]) || business.reviews > parseInt(reviewsRange[1])) {
+                            show = false;
+                        }
+                    } else if (selectedReviews === '100+' && business.reviews <= 100) {
+                        show = false;
+                    }
+                }
+
+                // Filter by rating
+                if (selectedRating !== 'all') {
+                    if (selectedRating === '4+' && business.rating < 4) {
+                        show = false;
+                    } else if (selectedRating === '3-4' && (business.rating < 3 || business.rating >= 4)) {
+                        show = false;
+                    } else if (selectedRating === 'below 3' && business.rating >= 3) {
+                        show = false;
+                    }
+                }
+
+                // Add marker if business passes the filters
+                if (show) {
+                    var marker = L.marker(business.coords).addTo(map);
+                    marker.bindPopup('<b>' + business.name + '</b><br>' + '<b>Type:</b> ' + business.type + '<br><b>Reviews:</b> ' + business.reviews + '<br><b>Rating:</b> ' + business.rating);
+                }
+            });
+        }
+
+        // Add event listeners to the filter dropdowns
+        document.getElementById('type-filter').addEventListener('change', filterBusinesses);
+        document.getElementById('reviews-filter').addEventListener('change', filterBusinesses);
+        document.getElementById('rating-filter').addEventListener('change', filterBusinesses);
+
+        // Initial filter to display points based on the default filter values
+        filterBusinesses();
+    </script>
+</body>
+</html>
